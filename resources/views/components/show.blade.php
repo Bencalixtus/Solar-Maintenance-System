@@ -1,4 +1,4 @@
-```blade
+
 <x-app-layout>
 
     <div class="container-fluid py-3">
@@ -980,4 +980,4 @@
     </div>
 
 </x-app-layout>
-```
+

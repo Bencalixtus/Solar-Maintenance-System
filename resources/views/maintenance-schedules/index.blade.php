@@ -12,11 +12,13 @@
                 </p>
             </div>
 
-            <a href="{{ route('maintenance-schedules.create') }}"
-               class="btn btn-success">
-                <i class="bi bi-plus-circle me-1"></i>
-                Add Maintenance Schedule
-            </a>
+            @if(in_array(auth()->user()->role, ['Admin', 'Technician']))
+                <a href="{{ route('maintenance-schedules.create') }}"
+                   class="btn btn-success">
+                    <i class="bi bi-plus-circle me-1"></i>
+                    Add Maintenance Schedule
+                </a>
+            @endif
         </div>
     </x-slot>
 
@@ -31,103 +33,153 @@
 
                 <button type="button"
                         class="btn-close"
-                        data-bs-dismiss="alert"></button>
+                        data-bs-dismiss="alert">
+                </button>
             </div>
         @endif
+
+        {{-- Error Message --}}
+        @if(session('error'))
+            <div class="alert alert-danger alert-dismissible fade show shadow-sm"
+                 role="alert">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                {{ session('error') }}
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="alert">
+                </button>
+            </div>
+        @endif
+
+        {{-- Validation Errors --}}
+        @if($errors->any())
+            <div class="alert alert-danger alert-dismissible fade show shadow-sm"
+                 role="alert">
+
+                <div class="d-flex align-items-start">
+                    <i class="bi bi-exclamation-triangle-fill me-2 mt-1"></i>
+
+                    <div>
+                        <strong>Please correct the following errors:</strong>
+
+                        <ul class="mb-0 mt-2 ps-3">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                </div>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="alert">
+                </button>
+            </div>
+        @endif
+
 
         {{-- Summary Cards --}}
         <div class="row g-3 mb-4">
 
-            <div class="col-md-6 col-xl">
+            {{-- Total --}}
+            <div class="col-xl-3 col-md-6">
                 <div class="card border-0 shadow-sm h-100">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
+
                             <div>
-                                <p class="text-muted mb-1">Total Schedules</p>
+                                <p class="text-muted mb-1">
+                                    Total Schedules
+                                </p>
+
                                 <h3 class="fw-bold mb-0">
                                     {{ $totalSchedules }}
                                 </h3>
                             </div>
 
-                            <div class="rounded-circle bg-success bg-opacity-10 p-3">
-                                <i class="bi bi-calendar3 text-success fs-4"></i>
+                            <div class="bg-success bg-opacity-10 rounded-circle p-3">
+                                <i class="bi bi-calendar-check text-success fs-4"></i>
                             </div>
+
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="col-md-6 col-xl">
+
+            {{-- Overdue --}}
+            <div class="col-xl-3 col-md-6">
                 <div class="card border-0 shadow-sm h-100">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
+
                             <div>
-                                <p class="text-muted mb-1">Overdue</p>
-                                <h3 class="fw-bold mb-0 text-danger">
+                                <p class="text-muted mb-1">
+                                    Overdue
+                                </p>
+
+                                <h3 class="fw-bold text-danger mb-0">
                                     {{ $overdueSchedules }}
                                 </h3>
                             </div>
 
-                            <div class="rounded-circle bg-danger bg-opacity-10 p-3">
+                            <div class="bg-danger bg-opacity-10 rounded-circle p-3">
                                 <i class="bi bi-exclamation-triangle text-danger fs-4"></i>
                             </div>
+
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="col-md-6 col-xl">
+
+            {{-- Due Today --}}
+            <div class="col-xl-3 col-md-6">
                 <div class="card border-0 shadow-sm h-100">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
+
                             <div>
-                                <p class="text-muted mb-1">Due Today</p>
-                                <h3 class="fw-bold mb-0 text-warning">
+                                <p class="text-muted mb-1">
+                                    Due Today
+                                </p>
+
+                                <h3 class="fw-bold text-warning mb-0">
                                     {{ $dueToday }}
                                 </h3>
                             </div>
 
-                            <div class="rounded-circle bg-warning bg-opacity-10 p-3">
+                            <div class="bg-warning bg-opacity-10 rounded-circle p-3">
                                 <i class="bi bi-clock-history text-warning fs-4"></i>
                             </div>
+
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="col-md-6 col-xl">
+
+            {{-- Upcoming --}}
+            <div class="col-xl-3 col-md-6">
                 <div class="card border-0 shadow-sm h-100">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
+
                             <div>
-                                <p class="text-muted mb-1">Next 7 Days</p>
-                                <h3 class="fw-bold mb-0 text-primary">
+                                <p class="text-muted mb-1">
+                                    Upcoming (7 Days)
+                                </p>
+
+                                <h3 class="fw-bold text-primary mb-0">
                                     {{ $upcomingSchedules }}
                                 </h3>
                             </div>
 
-                            <div class="rounded-circle bg-primary bg-opacity-10 p-3">
-                                <i class="bi bi-calendar-week text-primary fs-4"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-6 col-xl">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <p class="text-muted mb-1">Completed</p>
-                                <h3 class="fw-bold mb-0 text-success">
-                                    {{ $completedSchedules }}
-                                </h3>
+                            <div class="bg-primary bg-opacity-10 rounded-circle p-3">
+                                <i class="bi bi-calendar-event text-primary fs-4"></i>
                             </div>
 
-                            <div class="rounded-circle bg-success bg-opacity-10 p-3">
-                                <i class="bi bi-check2-circle text-success fs-4"></i>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -139,22 +191,29 @@
         {{-- Maintenance Schedule Table --}}
         <div class="card border-0 shadow-sm">
 
-            <div class="card-header bg-white border-bottom py-3">
+            <div class="card-header bg-white border-0 py-3">
+
                 <div class="d-flex justify-content-between align-items-center">
 
                     <div>
                         <h5 class="fw-bold mb-1">
                             <i class="bi bi-list-check me-2 text-success"></i>
-                            Maintenance Activities
+                            Maintenance Schedules
                         </h5>
 
                         <small class="text-muted">
-                            Scheduled preventive maintenance activities
+                            Manage and monitor preventive maintenance activities
                         </small>
                     </div>
 
+                    <span class="badge bg-success">
+                        {{ $totalSchedules }} Schedule{{ $totalSchedules != 1 ? 's' : '' }}
+                    </span>
+
                 </div>
+
             </div>
+
 
             <div class="card-body p-0">
 
@@ -165,30 +224,57 @@
                         <table class="table table-hover align-middle mb-0">
 
                             <thead class="table-light">
+
                                 <tr>
-                                    <th>#</th>
-                                    <th>Component</th>
-                                    <th>Installation</th>
-                                    <th>Maintenance Task</th>
-                                    <th>Frequency</th>
-                                    <th>Next Due</th>
-                                    <th>Priority</th>
-                                    <th>Status</th>
-                                    <th class="text-center">Actions</th>
+
+                                    <th class="px-3">
+                                        Component
+                                    </th>
+
+                                    <th>
+                                        Maintenance Task
+                                    </th>
+
+                                    <th>
+                                        Frequency
+                                    </th>
+
+                                    <th>
+                                        Next Due
+                                    </th>
+
+                                    <th>
+                                        Priority
+                                    </th>
+
+                                    <th>
+                                        Status
+                                    </th>
+
+                                    <th class="text-center">
+                                        Actions
+                                    </th>
+
                                 </tr>
+
                             </thead>
+
 
                             <tbody>
 
                                 @foreach($schedules as $schedule)
 
                                     @php
+
                                         $today = \Illuminate\Support\Carbon::today();
 
                                         $nextDue = $schedule->next_due_date
                                             ? \Illuminate\Support\Carbon::parse($schedule->next_due_date)
                                             : null;
 
+                                        /*
+                                         * Determine visual date state.
+                                         */
                                         $isOverdue = $nextDue
                                             && $nextDue->lt($today)
                                             && $schedule->status !== 'Completed';
@@ -199,17 +285,28 @@
 
                                         $isUpcoming = $nextDue
                                             && $nextDue->gt($today)
-                                            && $nextDue->lte($today->copy()->addDays(7))
+                                            && $nextDue->lte(
+                                                $today->copy()->addDays(7)
+                                            )
                                             && $schedule->status !== 'Completed';
+
+                                        /*
+                                         * Complete button is only available
+                                         * for Due or Overdue schedules.
+                                         */
+                                        $canComplete = in_array(
+                                            $schedule->status,
+                                            ['Due', 'Overdue']
+                                        );
+
                                     @endphp
+
 
                                     <tr>
 
-                                        <td>
-                                            {{ $loop->iteration }}
-                                        </td>
+                                        {{-- Component --}}
+                                        <td class="px-3">
 
-                                        <td>
                                             <div class="fw-semibold">
                                                 {{ $schedule->component->name ?? 'N/A' }}
                                             </div>
@@ -219,67 +316,95 @@
                                                     {{ $schedule->component->componentType->name }}
                                                 </small>
                                             @endif
+
                                         </td>
 
+
+                                        {{-- Maintenance Task --}}
                                         <td>
-                                            {{ $schedule->component->installation->name ?? 'N/A' }}
+
+                                            <span class="fw-semibold">
+                                                {{ $schedule->maintenance_task }}
+                                            </span>
+
                                         </td>
 
-                                        <td>
-                                            {{ $schedule->maintenance_task }}
-                                        </td>
 
+                                        {{-- Frequency --}}
                                         <td>
+
                                             <span class="badge bg-light text-dark border">
                                                 {{ $schedule->frequency }}
                                             </span>
+
                                         </td>
 
+
+                                        {{-- Next Due Date --}}
                                         <td>
 
                                             @if($nextDue)
 
-                                                <div class="fw-semibold
+                                                <div class="
+                                                    fw-semibold
                                                     {{ $isOverdue ? 'text-danger' : '' }}
                                                     {{ $isDueToday ? 'text-warning' : '' }}
-                                                    {{ $isUpcoming ? 'text-primary' : '' }}">
+                                                    {{ $isUpcoming ? 'text-primary' : '' }}
+                                                ">
 
                                                     {{ $nextDue->format('d M Y') }}
 
                                                 </div>
 
+
                                                 @if($isOverdue)
+
                                                     <small class="text-danger">
                                                         <i class="bi bi-exclamation-circle me-1"></i>
                                                         Overdue
                                                     </small>
+
                                                 @elseif($isDueToday)
+
                                                     <small class="text-warning">
                                                         <i class="bi bi-clock me-1"></i>
-                                                        Due today
+                                                        Due Today
                                                     </small>
+
                                                 @elseif($isUpcoming)
+
                                                     <small class="text-primary">
                                                         <i class="bi bi-calendar-event me-1"></i>
-                                                        Due soon
+                                                        Upcoming
                                                     </small>
+
                                                 @endif
 
                                             @else
+
                                                 <span class="text-muted">
-                                                    Not set
+                                                    Not scheduled
                                                 </span>
+
                                             @endif
 
                                         </td>
 
+
+                                        {{-- Priority --}}
                                         <td>
 
                                             @switch($schedule->priority)
 
-                                                @case('Critical')
-                                                    <span class="badge bg-danger">
-                                                        Critical
+                                                @case('Low')
+                                                    <span class="badge bg-success">
+                                                        Low
+                                                    </span>
+                                                    @break
+
+                                                @case('Medium')
+                                                    <span class="badge bg-info">
+                                                        Medium
                                                     </span>
                                                     @break
 
@@ -289,36 +414,31 @@
                                                     </span>
                                                     @break
 
-                                                @case('Medium')
-                                                    <span class="badge bg-info text-dark">
-                                                        Medium
+                                                @case('Critical')
+                                                    <span class="badge bg-danger">
+                                                        Critical
                                                     </span>
                                                     @break
 
                                                 @default
                                                     <span class="badge bg-secondary">
-                                                        Low
+                                                        {{ $schedule->priority }}
                                                     </span>
 
                                             @endswitch
 
                                         </td>
 
+
+                                        {{-- Status --}}
                                         <td>
 
                                             @switch($schedule->status)
 
-                                                @case('Completed')
-                                                    <span class="badge bg-success">
-                                                        <i class="bi bi-check-circle me-1"></i>
-                                                        Completed
-                                                    </span>
-                                                    @break
-
-                                                @case('Overdue')
-                                                    <span class="badge bg-danger">
-                                                        <i class="bi bi-exclamation-circle me-1"></i>
-                                                        Overdue
+                                                @case('Scheduled')
+                                                    <span class="badge bg-primary">
+                                                        <i class="bi bi-calendar-event me-1"></i>
+                                                        Scheduled
                                                     </span>
                                                     @break
 
@@ -329,20 +449,37 @@
                                                     </span>
                                                     @break
 
+                                                @case('Overdue')
+                                                    <span class="badge bg-danger">
+                                                        <i class="bi bi-exclamation-triangle me-1"></i>
+                                                        Overdue
+                                                    </span>
+                                                    @break
+
+                                                @case('Completed')
+                                                    <span class="badge bg-success">
+                                                        <i class="bi bi-check-circle me-1"></i>
+                                                        Completed
+                                                    </span>
+                                                    @break
+
                                                 @default
-                                                    <span class="badge bg-primary">
-                                                        <i class="bi bi-calendar-check me-1"></i>
-                                                        Scheduled
+                                                    <span class="badge bg-secondary">
+                                                        {{ $schedule->status }}
                                                     </span>
 
                                             @endswitch
 
                                         </td>
 
+
+                                        {{-- Actions --}}
                                         <td class="text-center">
 
-                                            <div class="btn-group" role="group">
+                                            <div class="btn-group"
+                                                 role="group">
 
+                                                {{-- View --}}
                                                 <a href="{{ route('maintenance-schedules.show', $schedule) }}"
                                                    class="btn btn-sm btn-outline-success"
                                                    title="View">
@@ -351,31 +488,61 @@
 
                                                 </a>
 
-                                                <a href="{{ route('maintenance-schedules.edit', $schedule) }}"
-                                                   class="btn btn-sm btn-outline-primary"
-                                                   title="Edit">
 
-                                                    <i class="bi bi-pencil-square"></i>
+                                                {{-- Edit --}}
+                                                @if(in_array(auth()->user()->role, ['Admin', 'Technician']))
 
-                                                </a>
+                                                    <a href="{{ route('maintenance-schedules.edit', $schedule) }}"
+                                                       class="btn btn-sm btn-outline-primary"
+                                                       title="Edit">
 
-                                                <form action="{{ route('maintenance-schedules.destroy', $schedule) }}"
-                                                      method="POST"
-                                                      class="d-inline"
-                                                      onsubmit="return confirm('Are you sure you want to delete this maintenance schedule?');">
+                                                        <i class="bi bi-pencil-square"></i>
 
-                                                    @csrf
-                                                    @method('DELETE')
+                                                    </a>
 
-                                                    <button type="submit"
-                                                            class="btn btn-sm btn-outline-danger"
-                                                            title="Delete">
+                                                @endif
 
-                                                        <i class="bi bi-trash"></i>
 
-                                                    </button>
+                                                {{-- Complete Maintenance --}}
+                                                @if(
+                                                    $canComplete &&
+                                                    in_array(auth()->user()->role, ['Admin', 'Technician'])
+                                                )
 
-                                                </form>
+                                                    <a href="{{ route('maintenance-schedules.complete', $schedule) }}"
+                                                       class="btn btn-sm btn-outline-success"
+                                                       title="Complete Maintenance">
+
+                                                        <i class="bi bi-check2-circle"></i>
+
+                                                    </a>
+
+                                                @endif
+
+
+                                                {{-- Delete --}}
+                                                @if(in_array(auth()->user()->role, ['Admin', 'Technician']))
+
+                                                    <form action="{{ route('maintenance-schedules.destroy', $schedule) }}"
+                                                          method="POST"
+                                                          class="d-inline"
+                                                          onsubmit="return confirm('Are you sure you want to delete this maintenance schedule?');">
+
+                                                        @csrf
+
+                                                        @method('DELETE')
+
+                                                        <button type="submit"
+                                                                class="btn btn-sm btn-outline-danger"
+                                                                title="Delete">
+
+                                                            <i class="bi bi-trash"></i>
+
+                                                        </button>
+
+                                                    </form>
+
+                                                @endif
 
                                             </div>
 
@@ -393,26 +560,39 @@
 
                 @else
 
+                    {{-- Empty State --}}
                     <div class="text-center py-5">
 
-                        <i class="bi bi-calendar-x text-muted"
-                           style="font-size: 60px;"></i>
+                        <div class="mb-3">
 
-                        <h5 class="mt-3 fw-bold">
+                            <div class="bg-light rounded-circle d-inline-flex p-4">
+
+                                <i class="bi bi-calendar-x text-muted fs-1"></i>
+
+                            </div>
+
+                        </div>
+
+                        <h5 class="fw-bold">
                             No Maintenance Schedules
                         </h5>
 
-                        <p class="text-muted">
-                            No preventive maintenance activities have been scheduled yet.
+                        <p class="text-muted mb-4">
+                            There are currently no maintenance schedules in the system.
                         </p>
 
-                        <a href="{{ route('maintenance-schedules.create') }}"
-                           class="btn btn-success">
+                        @if(in_array(auth()->user()->role, ['Admin', 'Technician']))
 
-                            <i class="bi bi-plus-circle me-1"></i>
-                            Create First Schedule
+                            <a href="{{ route('maintenance-schedules.create') }}"
+                               class="btn btn-success">
 
-                        </a>
+                                <i class="bi bi-plus-circle me-1"></i>
+
+                                Create First Schedule
+
+                            </a>
+
+                        @endif
 
                     </div>
 

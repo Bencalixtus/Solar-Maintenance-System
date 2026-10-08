@@ -356,68 +356,87 @@ Route::middleware(['auth'])->group(function () {
     });
 
 
+   /*
+|--------------------------------------------------------------------------
+| Maintenance Schedules
+|--------------------------------------------------------------------------
+*/
+
+// Admin and Technician can create schedules
+Route::middleware('role:Admin,Technician')->group(function () {
+
+    Route::get(
+        '/maintenance-schedules/create',
+        [MaintenanceScheduleController::class, 'create']
+    )->name('maintenance-schedules.create');
+
+    Route::post(
+        '/maintenance-schedules',
+        [MaintenanceScheduleController::class, 'store']
+    )->name('maintenance-schedules.store');
+});
+
+
+// Admin, Technician and Supervisor can view schedules
+Route::middleware('role:Admin,Technician,Supervisor')->group(function () {
+
+    Route::get(
+        '/maintenance-schedules',
+        [MaintenanceScheduleController::class, 'index']
+    )->name('maintenance-schedules.index');
+
+    Route::get(
+        '/maintenance-schedules/{maintenanceSchedule}',
+        [MaintenanceScheduleController::class, 'show']
+    )->name('maintenance-schedules.show');
+});
+
+
+// Admin and Technician can edit schedules
+Route::middleware('role:Admin,Technician')->group(function () {
+
+    Route::get(
+        '/maintenance-schedules/{maintenanceSchedule}/edit',
+        [MaintenanceScheduleController::class, 'edit']
+    )->name('maintenance-schedules.edit');
+
+    Route::put(
+        '/maintenance-schedules/{maintenanceSchedule}',
+        [MaintenanceScheduleController::class, 'update']
+    )->name('maintenance-schedules.update');
+
+    Route::patch(
+        '/maintenance-schedules/{maintenanceSchedule}',
+        [MaintenanceScheduleController::class, 'update']
+    );
+
     /*
     |--------------------------------------------------------------------------
-    | Maintenance Schedules
+    | Complete Maintenance
     |--------------------------------------------------------------------------
     */
 
-    Route::middleware('role:Admin,Technician')->group(function () {
+    Route::get(
+        '/maintenance-schedules/{maintenanceSchedule}/complete',
+        [MaintenanceScheduleController::class, 'complete']
+    )->name('maintenance-schedules.complete');
 
-        Route::get(
-            '/maintenance-schedules/create',
-            [MaintenanceScheduleController::class, 'create']
-        )->name('maintenance-schedules.create');
+    Route::post(
+        '/maintenance-schedules/{maintenanceSchedule}/complete',
+        [MaintenanceScheduleController::class, 'storeCompleted']
+    )->name('maintenance-schedules.complete.store');
 
-        Route::post(
-            '/maintenance-schedules',
-            [MaintenanceScheduleController::class, 'store']
-        )->name('maintenance-schedules.store');
-    });
+    /*
+    |--------------------------------------------------------------------------
+    | Delete Maintenance Schedule
+    |--------------------------------------------------------------------------
+    */
 
-
-    Route::middleware('role:Admin,Technician,Supervisor')->group(function () {
-
-        Route::get(
-            '/maintenance-schedules',
-            [MaintenanceScheduleController::class, 'index']
-        )->name('maintenance-schedules.index');
-
-        Route::get(
-            '/maintenance-schedules/{maintenanceSchedule}',
-            [MaintenanceScheduleController::class, 'show']
-        )->name('maintenance-schedules.show');
-    });
-
-
-    Route::middleware('role:Admin,Technician')->group(function () {
-
-        Route::get(
-            '/maintenance-schedules/{maintenanceSchedule}/edit',
-            [MaintenanceScheduleController::class, 'edit']
-        )->name('maintenance-schedules.edit');
-
-        Route::put(
-            '/maintenance-schedules/{maintenanceSchedule}',
-            [MaintenanceScheduleController::class, 'update']
-        )->name('maintenance-schedules.update');
-
-        Route::patch(
-            '/maintenance-schedules/{maintenanceSchedule}',
-            [MaintenanceScheduleController::class, 'update']
-        );
-    });
-
-
-    Route::middleware('role:Admin,Technician')->group(function () {
-
-        Route::delete(
-            '/maintenance-schedules/{maintenanceSchedule}',
-            [MaintenanceScheduleController::class, 'destroy']
-        )->name('maintenance-schedules.destroy');
-    });
-
-
+    Route::delete(
+        '/maintenance-schedules/{maintenanceSchedule}',
+        [MaintenanceScheduleController::class, 'destroy']
+    )->name('maintenance-schedules.destroy');
+});
     /*
     |--------------------------------------------------------------------------
     | Maintenance Records

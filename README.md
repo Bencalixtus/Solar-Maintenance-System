@@ -674,32 +674,96 @@ package.json
 
 ---
 
-## Project Screenshots
 
-Screenshots of the application can be added here as the project documentation is expanded.
+## System Screenshots
 
-Recommended screenshots include:
+The following screenshots provide a visual overview of the Solar Maintenance System and its major modules.
 
-1. Welcome Page
-2. Login Page
-3. Dashboard
-4. Installation Management
-5. Component Management
-6. Inspection Management
-7. Maintenance Schedule
-8. Complete Maintenance Form
-9. Maintenance Records
-10. Cost Records
-11. Replacement Forecast
-12. Reports
+### Welcome Page
 
-Example:
+The landing page introduces the Solar Maintenance System and provides access to the application.
 
-```text
-docs/screenshots/dashboard.png
-docs/screenshots/maintenance-schedule.png
-docs/screenshots/maintenance-records.png
-```
+![Welcome Page](docs/screenshots/welcome.png)
+
+---
+
+### Login Page
+
+The login interface provides authenticated access to the system.
+
+![Login Page](docs/screenshots/login.png)
+
+---
+
+### Dashboard
+
+The dashboard provides a summary of installations, components, inspections, maintenance activities, component conditions, and replacement risks.
+
+![Dashboard](docs/screenshots/dashboard.png)
+
+---
+
+### Installation Management
+
+The installation module provides a centralized interface for managing solar installations.
+
+![Installation Management](docs/screenshots/installations.png)
+
+---
+
+### Component Management
+
+The component module allows users to manage solar and battery system components and associate them with installations.
+
+![Component Management](docs/screenshots/components.png)
+
+---
+
+### Inspection Management
+
+The inspection module supports the recording and monitoring of component inspections and condition information.
+
+![Inspection Management](docs/screenshots/inspections.png)
+
+---
+
+### Maintenance Schedule
+
+The maintenance schedule module allows users to plan, monitor, and manage preventive maintenance activities.
+
+![Maintenance Schedule](docs/screenshots/maintenance-schedule.png)
+
+---
+
+### Maintenance Records
+
+The maintenance records module provides a historical record of completed maintenance activities.
+
+![Maintenance Records](docs/screenshots/maintenance-records.png)
+
+---
+
+### Cost Records
+
+The cost records module provides a way to record and monitor maintenance-related expenditure.
+
+![Cost Records](docs/screenshots/cost-records.png)
+
+---
+
+### Replacement Forecast
+
+The replacement forecasting module helps identify components that may require attention or replacement based on available system information.
+
+![Replacement Forecast](docs/screenshots/replacement-forecast.png)
+
+---
+
+### Reports
+
+The reporting module provides maintenance and system information for monitoring, analysis, and documentation.
+
+![Reports](docs/screenshots/reports.png)
 
 ---
 

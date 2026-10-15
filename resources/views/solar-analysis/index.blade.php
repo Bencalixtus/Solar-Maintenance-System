@@ -1,4 +1,3 @@
-
 @extends('layouts.app')
 
 @section('content')
@@ -95,7 +94,9 @@
                 <div class="row g-3 align-items-end">
 
                     <div class="col-12 col-md-4">
-                        <label for="type" class="form-label">Observation Type</label>
+                        <label for="type" class="form-label">
+                            Observation Type
+                        </label>
                         <select name="type" id="type" class="form-select">
                             <option value="">All observations</option>
                             <option value="anomaly"
@@ -132,9 +133,11 @@
                     </div>
 
                     <div class="col-12 col-md-2 d-flex gap-2">
-                        <button type="submit" class="btn btn-success flex-grow-1">
+                        <button type="submit"
+                                class="btn btn-success flex-grow-1">
                             Filter
                         </button>
+
                         <a href="{{ route('solar-analysis.index') }}"
                            class="btn btn-outline-secondary">
                             Reset
@@ -146,12 +149,95 @@
         </div>
     </div>
 
+    {{-- Solar performance charts --}}
+    <div class="row g-3 mb-4">
+
+        {{-- Daily power trend --}}
+        <div class="col-12">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h2 class="h5 mb-1">Daily Solar Power Trend</h2>
+                    <p class="text-muted small mb-0">
+                        Daily average DC and AC power readings from the research dataset.
+                    </p>
+                </div>
+
+                <div class="card-body">
+                    <div style="position: relative; height: 350px;">
+                        <canvas id="powerTrendChart"
+                                role="img"
+                                aria-label="Daily average DC and AC power chart">
+                        </canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Classification summary --}}
+        <div class="col-12 col-xl-5">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h2 class="h5 mb-1">Observation Classification</h2>
+                    <p class="text-muted small mb-0">
+                        Model classifications, not confirmed equipment faults.
+                    </p>
+                </div>
+
+                <div class="card-body">
+                    <div style="position: relative; height: 300px;">
+                        <canvas id="classificationChart"
+                                role="img"
+                                aria-label="Normal and unusual observation counts">
+                        </canvas>
+                    </div>
+
+                    <div class="text-muted small mt-3">
+                        Normal:
+                        {{ number_format($classificationChart['normal']) }}
+                        · Unusual:
+                        {{ number_format($classificationChart['unusual']) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Irradiance relationship --}}
+        <div class="col-12 col-xl-7">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h2 class="h5 mb-1">Solar Irradiance and DC Power</h2>
+                    <p class="text-muted small mb-0">
+                        Sample of up to 500 observations with available readings.
+                    </p>
+                </div>
+
+                <div class="card-body">
+                    <div style="position: relative; height: 300px;">
+                        <canvas id="irradianceChart"
+                                role="img"
+                                aria-label="Solar irradiance versus DC power scatter chart">
+                        </canvas>
+                    </div>
+
+                    <p class="text-muted small mt-3 mb-0">
+                        Each point represents one observation. This chart explores
+                        the relationship between recorded irradiance and DC power;
+                        it does not establish causation.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
     {{-- Research observations table --}}
     <div class="card border-0 shadow-sm">
-        <div class="card-header bg-white d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <div class="card-header bg-white d-flex flex-wrap
+                    justify-content-between align-items-center gap-2">
             <h2 class="h5 mb-0">Research Observations</h2>
+
             <span class="text-muted small">
-                {{ $results->total() }} matching records
+                {{ number_format($results->total()) }} matching records
             </span>
         </div>
 
@@ -184,23 +270,33 @@
                                 </td>
 
                                 <td>
-                                    {{ $result->irradiance !== null ? number_format((float) $result->irradiance, 2) : 'N/A' }}
+                                    {{ $result->irradiance !== null
+                                        ? number_format((float) $result->irradiance, 2)
+                                        : 'N/A' }}
                                 </td>
 
                                 <td>
-                                    {{ $result->dc_power !== null ? number_format((float) $result->dc_power, 2) : 'N/A' }}
+                                    {{ $result->dc_power !== null
+                                        ? number_format((float) $result->dc_power, 2)
+                                        : 'N/A' }}
                                 </td>
 
                                 <td>
-                                    {{ $result->ac_power !== null ? number_format((float) $result->ac_power, 2) : 'N/A' }}
+                                    {{ $result->ac_power !== null
+                                        ? number_format((float) $result->ac_power, 2)
+                                        : 'N/A' }}
                                 </td>
 
                                 <td>
-                                    {{ $result->dc_voltage !== null ? number_format((float) $result->dc_voltage, 2) : 'N/A' }}
+                                    {{ $result->dc_voltage !== null
+                                        ? number_format((float) $result->dc_voltage, 2)
+                                        : 'N/A' }}
                                 </td>
 
                                 <td>
-                                    {{ $result->dc_current !== null ? number_format((float) $result->dc_current, 2) : 'N/A' }}
+                                    {{ $result->dc_current !== null
+                                        ? number_format((float) $result->dc_current, 2)
+                                        : 'N/A' }}
                                 </td>
 
                                 <td>
@@ -225,6 +321,7 @@
                                     <p class="text-muted mb-2">
                                         No observations match your filters.
                                     </p>
+
                                     <a href="{{ route('solar-analysis.index') }}"
                                        class="btn btn-outline-success btn-sm">
                                         Clear Filters
@@ -244,6 +341,7 @@
         @endif
     </div>
 
+    {{-- Research limitation notice --}}
     <p class="text-muted small mt-3">
         The displayed measurements retain the units recorded in the source
         dataset. Verify source metadata before interpreting them. Unusual
@@ -253,3 +351,238 @@
 
 </div>
 @endsection
+
+{{-- Chart.js --}}
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    if (typeof Chart === 'undefined') {
+        console.error('Chart.js did not load. Check your internet connection.');
+        return;
+    }
+
+    const powerData = {{ Illuminate\Support\Js::from($powerChart) }};
+    const classificationData = {{ Illuminate\Support\Js::from($classificationChart) }};
+    const relationshipData = {{ Illuminate\Support\Js::from($relationshipChart) }};
+
+    const commonLegend = {
+        position: 'bottom',
+        labels: {
+            usePointStyle: true,
+            padding: 18
+        }
+    };
+
+    // 1. Daily DC and AC power trend.
+    const powerCanvas = document.getElementById('powerTrendChart');
+
+    if (powerCanvas) {
+        new Chart(powerCanvas, {
+            type: 'line',
+            data: {
+                labels: powerData.labels,
+                datasets: [
+                    {
+                        label: 'Average DC Power',
+                        data: powerData.dcPower,
+                        borderColor: '#198754',
+                        backgroundColor: 'rgba(25, 135, 84, 0.12)',
+                        borderWidth: 2,
+                        pointRadius: 2,
+                        tension: 0.25,
+                        spanGaps: true
+                    },
+                    {
+                        label: 'Average AC Power',
+                        data: powerData.acPower,
+                        borderColor: '#0d6efd',
+                        backgroundColor: 'rgba(13, 110, 253, 0.10)',
+                        borderWidth: 2,
+                        pointRadius: 2,
+                        tension: 0.25,
+                        spanGaps: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                plugins: {
+                    legend: commonLegend,
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                const value = context.parsed.y;
+                                return context.dataset.label + ': ' +
+                                    (value === null ? 'N/A' :
+                                        Number(value).toLocaleString(undefined, {
+                                            maximumFractionDigits: 2
+                                        }));
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Observation date'
+                        },
+                        ticks: {
+                            maxTicksLimit: 12,
+                            maxRotation: 45,
+                            minRotation: 0
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Recorded power (source units)'
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // 2. Normal versus model-flagged observations.
+    const classificationCanvas =
+        document.getElementById('classificationChart');
+
+    if (classificationCanvas) {
+        new Chart(classificationCanvas, {
+            type: 'doughnut',
+            data: {
+                labels: ['Normal patterns', 'Unusual patterns'],
+                datasets: [{
+                    data: [
+                        classificationData.normal,
+                        classificationData.unusual
+                    ],
+                    backgroundColor: ['#198754', '#ffc107'],
+                    borderColor: ['#ffffff', '#ffffff'],
+                    borderWidth: 2,
+                    hoverOffset: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '62%',
+                plugins: {
+                    legend: commonLegend,
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                const value = context.parsed || 0;
+                                const total = context.dataset.data.reduce(
+                                    (sum, number) => sum + number, 0
+                                );
+                                const percentage = total
+                                    ? ((value / total) * 100).toFixed(2)
+                                    : '0.00';
+
+                                return context.label + ': ' +
+                                    value.toLocaleString() + ' (' +
+                                    percentage + '%)';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // 3. Irradiance versus DC power.
+    const relationshipCanvas =
+        document.getElementById('irradianceChart');
+
+    if (relationshipCanvas) {
+        const normalPoints = [];
+        const unusualPoints = [];
+
+        relationshipData.irradiance.forEach(function (irradiance, index) {
+            const point = {
+                x: irradiance,
+                y: relationshipData.dcPower[index]
+            };
+
+            if (relationshipData.unusual[index]) {
+                unusualPoints.push(point);
+            } else {
+                normalPoints.push(point);
+            }
+        });
+
+        new Chart(relationshipCanvas, {
+            type: 'scatter',
+            data: {
+                datasets: [
+                    {
+                        label: 'Normal pattern',
+                        data: normalPoints,
+                        backgroundColor: 'rgba(25, 135, 84, 0.65)',
+                        borderColor: '#198754',
+                        pointRadius: 3,
+                        pointHoverRadius: 6
+                    },
+                    {
+                        label: 'Unusual pattern',
+                        data: unusualPoints,
+                        backgroundColor: 'rgba(255, 193, 7, 0.85)',
+                        borderColor: '#b58100',
+                        pointRadius: 4,
+                        pointHoverRadius: 7
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: commonLegend,
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                return context.dataset.label +
+                                    ' — Irradiance: ' +
+                                    Number(context.parsed.x).toLocaleString(
+                                        undefined,
+                                        { maximumFractionDigits: 2 }
+                                    ) +
+                                    ', DC power: ' +
+                                    Number(context.parsed.y).toLocaleString(
+                                        undefined,
+                                        { maximumFractionDigits: 2 }
+                                    );
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Recorded irradiance (source units)'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Recorded DC power (source units)'
+                        }
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
+@endpush

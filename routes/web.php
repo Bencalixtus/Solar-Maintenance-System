@@ -16,7 +16,6 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\SolarAnalysisController;
 
-
 /*
 |--------------------------------------------------------------------------
 | Public Routes
@@ -34,9 +33,8 @@ Route::get('/', function () {
 */
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
-    ->middleware(['auth'])
+    ->middleware('auth')
     ->name('dashboard');
-
 
 /*
 |--------------------------------------------------------------------------
@@ -44,7 +42,7 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware('auth')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
@@ -53,56 +51,31 @@ Route::middleware(['auth'])->group(function () {
     */
 
     Route::middleware('role:Admin')->group(function () {
+        Route::get('/installations/create', [InstallationController::class, 'create'])
+            ->name('installations.create');
 
-        Route::get(
-            '/installations/create',
-            [InstallationController::class, 'create']
-        )->name('installations.create');
+        Route::post('/installations', [InstallationController::class, 'store'])
+            ->name('installations.store');
 
-        Route::post(
-            '/installations',
-            [InstallationController::class, 'store']
-        )->name('installations.store');
+        Route::get('/installations/{installation}/edit', [InstallationController::class, 'edit'])
+            ->name('installations.edit');
+
+        Route::put('/installations/{installation}', [InstallationController::class, 'update'])
+            ->name('installations.update');
+
+        Route::patch('/installations/{installation}', [InstallationController::class, 'update']);
+
+        Route::delete('/installations/{installation}', [InstallationController::class, 'destroy'])
+            ->name('installations.destroy');
     });
-
 
     Route::middleware('role:Admin,Technician,Supervisor')->group(function () {
+        Route::get('/installations', [InstallationController::class, 'index'])
+            ->name('installations.index');
 
-        Route::get(
-            '/installations',
-            [InstallationController::class, 'index']
-        )->name('installations.index');
-
-        Route::get(
-            '/installations/{installation}',
-            [InstallationController::class, 'show']
-        )->name('installations.show');
+        Route::get('/installations/{installation}', [InstallationController::class, 'show'])
+            ->name('installations.show');
     });
-
-
-    Route::middleware('role:Admin')->group(function () {
-
-        Route::get(
-            '/installations/{installation}/edit',
-            [InstallationController::class, 'edit']
-        )->name('installations.edit');
-
-        Route::put(
-            '/installations/{installation}',
-            [InstallationController::class, 'update']
-        )->name('installations.update');
-
-        Route::patch(
-            '/installations/{installation}',
-            [InstallationController::class, 'update']
-        );
-
-        Route::delete(
-            '/installations/{installation}',
-            [InstallationController::class, 'destroy']
-        )->name('installations.destroy');
-    });
-
 
     /*
     |--------------------------------------------------------------------------
@@ -111,60 +84,33 @@ Route::middleware(['auth'])->group(function () {
     */
 
     Route::middleware('role:Admin,Technician')->group(function () {
+        Route::get('/component-types/create', [ComponentTypeController::class, 'create'])
+            ->name('component-types.create');
 
-        Route::get(
-            '/component-types/create',
-            [ComponentTypeController::class, 'create']
-        )->name('component-types.create');
+        Route::post('/component-types', [ComponentTypeController::class, 'store'])
+            ->name('component-types.store');
 
-        Route::post(
-            '/component-types',
-            [ComponentTypeController::class, 'store']
-        )->name('component-types.store');
+        Route::get('/component-types/{componentType}/edit', [ComponentTypeController::class, 'edit'])
+            ->name('component-types.edit');
+
+        Route::put('/component-types/{componentType}', [ComponentTypeController::class, 'update'])
+            ->name('component-types.update');
+
+        Route::patch('/component-types/{componentType}', [ComponentTypeController::class, 'update']);
     });
-
 
     Route::middleware('role:Admin,Technician,Supervisor')->group(function () {
+        Route::get('/component-types', [ComponentTypeController::class, 'index'])
+            ->name('component-types.index');
 
-        Route::get(
-            '/component-types',
-            [ComponentTypeController::class, 'index']
-        )->name('component-types.index');
-
-        Route::get(
-            '/component-types/{componentType}',
-            [ComponentTypeController::class, 'show']
-        )->name('component-types.show');
+        Route::get('/component-types/{componentType}', [ComponentTypeController::class, 'show'])
+            ->name('component-types.show');
     });
-
-
-    Route::middleware('role:Admin,Technician')->group(function () {
-
-        Route::get(
-            '/component-types/{componentType}/edit',
-            [ComponentTypeController::class, 'edit']
-        )->name('component-types.edit');
-
-        Route::put(
-            '/component-types/{componentType}',
-            [ComponentTypeController::class, 'update']
-        )->name('component-types.update');
-
-        Route::patch(
-            '/component-types/{componentType}',
-            [ComponentTypeController::class, 'update']
-        );
-    });
-
 
     Route::middleware('role:Admin')->group(function () {
-
-        Route::delete(
-            '/component-types/{componentType}',
-            [ComponentTypeController::class, 'destroy']
-        )->name('component-types.destroy');
+        Route::delete('/component-types/{componentType}', [ComponentTypeController::class, 'destroy'])
+            ->name('component-types.destroy');
     });
-
 
     /*
     |--------------------------------------------------------------------------
@@ -173,60 +119,33 @@ Route::middleware(['auth'])->group(function () {
     */
 
     Route::middleware('role:Admin,Technician')->group(function () {
+        Route::get('/components/create', [ComponentController::class, 'create'])
+            ->name('components.create');
 
-        Route::get(
-            '/components/create',
-            [ComponentController::class, 'create']
-        )->name('components.create');
+        Route::post('/components', [ComponentController::class, 'store'])
+            ->name('components.store');
 
-        Route::post(
-            '/components',
-            [ComponentController::class, 'store']
-        )->name('components.store');
+        Route::get('/components/{component}/edit', [ComponentController::class, 'edit'])
+            ->name('components.edit');
+
+        Route::put('/components/{component}', [ComponentController::class, 'update'])
+            ->name('components.update');
+
+        Route::patch('/components/{component}', [ComponentController::class, 'update']);
     });
-
 
     Route::middleware('role:Admin,Technician,Supervisor')->group(function () {
+        Route::get('/components', [ComponentController::class, 'index'])
+            ->name('components.index');
 
-        Route::get(
-            '/components',
-            [ComponentController::class, 'index']
-        )->name('components.index');
-
-        Route::get(
-            '/components/{component}',
-            [ComponentController::class, 'show']
-        )->name('components.show');
+        Route::get('/components/{component}', [ComponentController::class, 'show'])
+            ->name('components.show');
     });
-
-
-    Route::middleware('role:Admin,Technician')->group(function () {
-
-        Route::get(
-            '/components/{component}/edit',
-            [ComponentController::class, 'edit']
-        )->name('components.edit');
-
-        Route::put(
-            '/components/{component}',
-            [ComponentController::class, 'update']
-        )->name('components.update');
-
-        Route::patch(
-            '/components/{component}',
-            [ComponentController::class, 'update']
-        );
-    });
-
 
     Route::middleware('role:Admin')->group(function () {
-
-        Route::delete(
-            '/components/{component}',
-            [ComponentController::class, 'destroy']
-        )->name('components.destroy');
+        Route::delete('/components/{component}', [ComponentController::class, 'destroy'])
+            ->name('components.destroy');
     });
-
 
     /*
     |--------------------------------------------------------------------------
@@ -235,65 +154,34 @@ Route::middleware(['auth'])->group(function () {
     */
 
     Route::middleware('role:Admin,Technician')->group(function () {
+        Route::get('/inspections/create', [InspectionController::class, 'create'])
+            ->name('inspections.create');
 
-        Route::get(
-            '/inspections/create',
-            [InspectionController::class, 'create']
-        )->name('inspections.create');
+        Route::post('/inspections', [InspectionController::class, 'store'])
+            ->name('inspections.store');
 
-        Route::post(
-            '/inspections',
-            [InspectionController::class, 'store']
-        )->name('inspections.store');
+        Route::get('/inspections/{inspection}/edit', [InspectionController::class, 'edit'])
+            ->name('inspections.edit');
+
+        Route::put('/inspections/{inspection}', [InspectionController::class, 'update'])
+            ->name('inspections.update');
+
+        Route::patch('/inspections/{inspection}', [InspectionController::class, 'update']);
+
+        Route::delete('/inspections/{inspection}', [InspectionController::class, 'destroy'])
+            ->name('inspections.destroy');
     });
-
 
     Route::middleware('role:Admin,Technician,Supervisor')->group(function () {
+        Route::get('/inspections', [InspectionController::class, 'index'])
+            ->name('inspections.index');
 
-        Route::get(
-            '/inspections',
-            [InspectionController::class, 'index']
-        )->name('inspections.index');
+        Route::get('/inspections/{inspection}/print', [InspectionController::class, 'print'])
+            ->name('inspections.print');
 
-        Route::get(
-            '/inspections/{inspection}',
-            [InspectionController::class, 'show']
-        )->name('inspections.show');
-
-        Route::get(
-            '/inspections/{inspection}/print',
-            [InspectionController::class, 'print']
-        )->name('inspections.print');
+        Route::get('/inspections/{inspection}', [InspectionController::class, 'show'])
+            ->name('inspections.show');
     });
-
-
-    Route::middleware('role:Admin,Technician')->group(function () {
-
-        Route::get(
-            '/inspections/{inspection}/edit',
-            [InspectionController::class, 'edit']
-        )->name('inspections.edit');
-
-        Route::put(
-            '/inspections/{inspection}',
-            [InspectionController::class, 'update']
-        )->name('inspections.update');
-
-        Route::patch(
-            '/inspections/{inspection}',
-            [InspectionController::class, 'update']
-        );
-    });
-
-
-    Route::middleware('role:Admin,Technician')->group(function () {
-
-        Route::delete(
-            '/inspections/{inspection}',
-            [InspectionController::class, 'destroy']
-        )->name('inspections.destroy');
-    });
-
 
     /*
     |--------------------------------------------------------------------------
@@ -302,142 +190,71 @@ Route::middleware(['auth'])->group(function () {
     */
 
     Route::middleware('role:Admin,Technician')->group(function () {
+        Route::get('/measurements/create', [MeasurementController::class, 'create'])
+            ->name('measurements.create');
 
-        Route::get(
-            '/measurements/create',
-            [MeasurementController::class, 'create']
-        )->name('measurements.create');
+        Route::post('/measurements', [MeasurementController::class, 'store'])
+            ->name('measurements.store');
 
-        Route::post(
-            '/measurements',
-            [MeasurementController::class, 'store']
-        )->name('measurements.store');
+        Route::get('/measurements/{measurement}/edit', [MeasurementController::class, 'edit'])
+            ->name('measurements.edit');
+
+        Route::put('/measurements/{measurement}', [MeasurementController::class, 'update'])
+            ->name('measurements.update');
+
+        Route::patch('/measurements/{measurement}', [MeasurementController::class, 'update']);
+
+        Route::delete('/measurements/{measurement}', [MeasurementController::class, 'destroy'])
+            ->name('measurements.destroy');
     });
-
 
     Route::middleware('role:Admin,Technician,Supervisor')->group(function () {
+        Route::get('/measurements', [MeasurementController::class, 'index'])
+            ->name('measurements.index');
 
-        Route::get(
-            '/measurements',
-            [MeasurementController::class, 'index']
-        )->name('measurements.index');
-
-        Route::get(
-            '/measurements/{measurement}',
-            [MeasurementController::class, 'show']
-        )->name('measurements.show');
+        Route::get('/measurements/{measurement}', [MeasurementController::class, 'show'])
+            ->name('measurements.show');
     });
-
-
-    Route::middleware('role:Admin,Technician')->group(function () {
-
-        Route::get(
-            '/measurements/{measurement}/edit',
-            [MeasurementController::class, 'edit']
-        )->name('measurements.edit');
-
-        Route::put(
-            '/measurements/{measurement}',
-            [MeasurementController::class, 'update']
-        )->name('measurements.update');
-
-        Route::patch(
-            '/measurements/{measurement}',
-            [MeasurementController::class, 'update']
-        );
-    });
-
-
-    Route::middleware('role:Admin,Technician')->group(function () {
-
-        Route::delete(
-            '/measurements/{measurement}',
-            [MeasurementController::class, 'destroy']
-        )->name('measurements.destroy');
-    });
-
-
-   /*
-|--------------------------------------------------------------------------
-| Maintenance Schedules
-|--------------------------------------------------------------------------
-*/
-
-// Admin and Technician can create schedules
-Route::middleware('role:Admin,Technician')->group(function () {
-
-    Route::get(
-        '/maintenance-schedules/create',
-        [MaintenanceScheduleController::class, 'create']
-    )->name('maintenance-schedules.create');
-
-    Route::post(
-        '/maintenance-schedules',
-        [MaintenanceScheduleController::class, 'store']
-    )->name('maintenance-schedules.store');
-});
-
-
-// Admin, Technician and Supervisor can view schedules
-Route::middleware('role:Admin,Technician,Supervisor')->group(function () {
-
-    Route::get(
-        '/maintenance-schedules',
-        [MaintenanceScheduleController::class, 'index']
-    )->name('maintenance-schedules.index');
-
-    Route::get(
-        '/maintenance-schedules/{maintenanceSchedule}',
-        [MaintenanceScheduleController::class, 'show']
-    )->name('maintenance-schedules.show');
-});
-
-
-// Admin and Technician can edit schedules
-Route::middleware('role:Admin,Technician')->group(function () {
-
-    Route::get(
-        '/maintenance-schedules/{maintenanceSchedule}/edit',
-        [MaintenanceScheduleController::class, 'edit']
-    )->name('maintenance-schedules.edit');
-
-    Route::put(
-        '/maintenance-schedules/{maintenanceSchedule}',
-        [MaintenanceScheduleController::class, 'update']
-    )->name('maintenance-schedules.update');
-
-    Route::patch(
-        '/maintenance-schedules/{maintenanceSchedule}',
-        [MaintenanceScheduleController::class, 'update']
-    );
 
     /*
     |--------------------------------------------------------------------------
-    | Complete Maintenance
+    | Maintenance Schedules
     |--------------------------------------------------------------------------
     */
 
-    Route::get(
-        '/maintenance-schedules/{maintenanceSchedule}/complete',
-        [MaintenanceScheduleController::class, 'complete']
-    )->name('maintenance-schedules.complete');
+    Route::middleware('role:Admin,Technician')->group(function () {
+        Route::get('/maintenance-schedules/create', [MaintenanceScheduleController::class, 'create'])
+            ->name('maintenance-schedules.create');
 
-    Route::post(
-        '/maintenance-schedules/{maintenanceSchedule}/complete',
-        [MaintenanceScheduleController::class, 'storeCompleted']
-    )->name('maintenance-schedules.complete.store');
+        Route::post('/maintenance-schedules', [MaintenanceScheduleController::class, 'store'])
+            ->name('maintenance-schedules.store');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Delete Maintenance Schedule
-    |--------------------------------------------------------------------------
-    */
+        Route::get('/maintenance-schedules/{maintenanceSchedule}/edit', [MaintenanceScheduleController::class, 'edit'])
+            ->name('maintenance-schedules.edit');
 
-    Route::delete(
-        '/maintenance-schedules/{maintenanceSchedule}',
-        [MaintenanceScheduleController::class, 'destroy']
-    )->name('maintenance-schedules.destroy');
-});
+        Route::put('/maintenance-schedules/{maintenanceSchedule}', [MaintenanceScheduleController::class, 'update'])
+            ->name('maintenance-schedules.update');
+
+        Route::patch('/maintenance-schedules/{maintenanceSchedule}', [MaintenanceScheduleController::class, 'update']);
+
+        Route::get('/maintenance-schedules/{maintenanceSchedule}/complete', [MaintenanceScheduleController::class, 'complete'])
+            ->name('maintenance-schedules.complete');
+
+        Route::post('/maintenance-schedules/{maintenanceSchedule}/complete', [MaintenanceScheduleController::class, 'storeCompleted'])
+            ->name('maintenance-schedules.complete.store');
+
+        Route::delete('/maintenance-schedules/{maintenanceSchedule}', [MaintenanceScheduleController::class, 'destroy'])
+            ->name('maintenance-schedules.destroy');
+    });
+
+    Route::middleware('role:Admin,Technician,Supervisor')->group(function () {
+        Route::get('/maintenance-schedules', [MaintenanceScheduleController::class, 'index'])
+            ->name('maintenance-schedules.index');
+
+        Route::get('/maintenance-schedules/{maintenanceSchedule}', [MaintenanceScheduleController::class, 'show'])
+            ->name('maintenance-schedules.show');
+    });
+
     /*
     |--------------------------------------------------------------------------
     | Maintenance Records
@@ -445,73 +262,46 @@ Route::middleware('role:Admin,Technician')->group(function () {
     */
 
     Route::middleware('role:Admin,Technician')->group(function () {
+        Route::get('/maintenance-records/create', [MaintenanceRecordController::class, 'create'])
+            ->name('maintenance-records.create');
 
-        Route::get(
-            '/maintenance-records/create',
-            [MaintenanceRecordController::class, 'create']
-        )->name('maintenance-records.create');
+        Route::post('/maintenance-records', [MaintenanceRecordController::class, 'store'])
+            ->name('maintenance-records.store');
 
-        Route::post(
-            '/maintenance-records',
-            [MaintenanceRecordController::class, 'store']
-        )->name('maintenance-records.store');
+        Route::get('/maintenance-records/{maintenanceRecord}/edit', [MaintenanceRecordController::class, 'edit'])
+            ->name('maintenance-records.edit');
+
+        Route::put('/maintenance-records/{maintenanceRecord}', [MaintenanceRecordController::class, 'update'])
+            ->name('maintenance-records.update');
+
+        Route::patch('/maintenance-records/{maintenanceRecord}', [MaintenanceRecordController::class, 'update']);
+
+        Route::delete('/maintenance-records/{maintenanceRecord}', [MaintenanceRecordController::class, 'destroy'])
+            ->name('maintenance-records.destroy');
     });
-
 
     Route::middleware('role:Admin,Technician,Supervisor')->group(function () {
+        Route::get('/maintenance-records', [MaintenanceRecordController::class, 'index'])
+            ->name('maintenance-records.index');
 
-        Route::get(
-            '/maintenance-records',
-            [MaintenanceRecordController::class, 'index']
-        )->name('maintenance-records.index');
-
-        Route::get(
-            '/maintenance-records/{maintenanceRecord}',
-            [MaintenanceRecordController::class, 'show']
-        )->name('maintenance-records.show');
-    });
-
-
-    Route::middleware('role:Admin,Technician')->group(function () {
-
-        Route::get(
-            '/maintenance-records/{maintenanceRecord}/edit',
-            [MaintenanceRecordController::class, 'edit']
-        )->name('maintenance-records.edit');
-
-        Route::put(
-            '/maintenance-records/{maintenanceRecord}',
-            [MaintenanceRecordController::class, 'update']
-        )->name('maintenance-records.update');
-
-        Route::patch(
-            '/maintenance-records/{maintenanceRecord}',
-            [MaintenanceRecordController::class, 'update']
-        );
-    });
-
-
-    Route::middleware('role:Admin,Technician')->group(function () {
-
-        Route::delete(
-            '/maintenance-records/{maintenanceRecord}',
-            [MaintenanceRecordController::class, 'destroy']
-        )->name('maintenance-records.destroy');
+        Route::get('/maintenance-records/{maintenanceRecord}', [MaintenanceRecordController::class, 'show'])
+            ->name('maintenance-records.show');
     });
 
     /*
-|--------------------------------------------------------------------------
-| Solar Performance Analysis
-|--------------------------------------------------------------------------
-*/
+    |--------------------------------------------------------------------------
+    | Solar Performance Analysis
+    |--------------------------------------------------------------------------
+    */
 
-Route::middleware('role:Admin,Technician,Supervisor')->group(function () {
-    Route::get(
-        '/solar-analysis',
-        [SolarAnalysisController::class, 'index']
-    )->name('solar-analysis.index');
-});
+    Route::middleware('role:Admin,Technician,Supervisor')->group(function () {
+        Route::get('/solar-analysis', [SolarAnalysisController::class, 'index'])
+            ->name('solar-analysis.index');
 
+        Route::get('/solar-analysis/{result}', [SolarAnalysisController::class, 'show'])
+            ->whereNumber('result')
+            ->name('solar-analysis.show');
+    });
 
     /*
     |--------------------------------------------------------------------------
@@ -519,145 +309,71 @@ Route::middleware('role:Admin,Technician,Supervisor')->group(function () {
     |--------------------------------------------------------------------------
     */
 
-   Route::get('/degradation', [DashboardController::class, 'degradation'])
-    ->middleware('role:Admin,Technician,Supervisor')
-    ->name('degradation.index');
+    Route::get('/degradation', [DashboardController::class, 'degradation'])
+        ->middleware('role:Admin,Technician,Supervisor')
+        ->name('degradation.index');
 
     /*
     |--------------------------------------------------------------------------
     | Cost Management
     |--------------------------------------------------------------------------
-    | Admin:
-    |   View, Add, Edit, Delete
-    |
-    | Technician:
-    |   No access
-    |
-    | Supervisor:
-    |   View, Add, Edit
-    |--------------------------------------------------------------------------
     */
 
-    // Admin and Supervisor: create cost record
     Route::middleware('role:Admin,Supervisor')->group(function () {
+        Route::get('/cost-records/create', [CostRecordController::class, 'create'])
+            ->name('cost-records.create');
 
-        Route::get(
-            '/cost-records/create',
-            [CostRecordController::class, 'create']
-        )->name('cost-records.create');
+        Route::post('/cost-records', [CostRecordController::class, 'store'])
+            ->name('cost-records.store');
 
-        Route::post(
-            '/cost-records',
-            [CostRecordController::class, 'store']
-        )->name('cost-records.store');
+        Route::get('/cost-records', [CostRecordController::class, 'index'])
+            ->name('cost-records.index');
+
+        Route::get('/cost-records/{costRecord}/edit', [CostRecordController::class, 'edit'])
+            ->name('cost-records.edit');
+
+        Route::put('/cost-records/{costRecord}', [CostRecordController::class, 'update'])
+            ->name('cost-records.update');
+
+        Route::patch('/cost-records/{costRecord}', [CostRecordController::class, 'update']);
+
+        Route::get('/cost-records/{costRecord}', [CostRecordController::class, 'show'])
+            ->name('cost-records.show');
     });
 
-
-    // Admin and Supervisor: view cost records
-    Route::middleware('role:Admin,Supervisor')->group(function () {
-
-        Route::get(
-            '/cost-records',
-            [CostRecordController::class, 'index']
-        )->name('cost-records.index');
-
-        Route::get(
-            '/cost-records/{costRecord}',
-            [CostRecordController::class, 'show']
-        )->name('cost-records.show');
-    });
-
-
-    // Admin and Supervisor: edit cost record
-    Route::middleware('role:Admin,Supervisor')->group(function () {
-
-        Route::get(
-            '/cost-records/{costRecord}/edit',
-            [CostRecordController::class, 'edit']
-        )->name('cost-records.edit');
-
-        Route::put(
-            '/cost-records/{costRecord}',
-            [CostRecordController::class, 'update']
-        )->name('cost-records.update');
-
-        Route::patch(
-            '/cost-records/{costRecord}',
-            [CostRecordController::class, 'update']
-        );
-    });
-
-
-    // Admin only: delete cost record
     Route::middleware('role:Admin')->group(function () {
-
-        Route::delete(
-            '/cost-records/{costRecord}',
-            [CostRecordController::class, 'destroy']
-        )->name('cost-records.destroy');
+        Route::delete('/cost-records/{costRecord}', [CostRecordController::class, 'destroy'])
+            ->name('cost-records.destroy');
     });
-
 
     /*
     |--------------------------------------------------------------------------
-    | Replacement Forecast
+    | Replacement Forecasts
     |--------------------------------------------------------------------------
     */
 
-    Route::get(
-        '/replacement-forecasts',
-        [ReplacementForecastController::class, 'index']
-    )->name('replacement-forecasts.index');
+    Route::middleware('role:Admin,Technician,Supervisor')->group(function () {
+        Route::get('/replacement-forecasts', [ReplacementForecastController::class, 'index'])
+            ->name('replacement-forecasts.index');
 
-   // ==========================================================
-// REPLACEMENT FORECASTS
-// ==========================================================
+        Route::get('/replacement-forecasts/{replacementForecast}', [ReplacementForecastController::class, 'show'])
+            ->whereNumber('replacementForecast')
+            ->name('replacement-forecasts.show');
+    });
 
-// View forecasts - Admin, Technician, Supervisor
-Route::middleware('role:Admin,Technician,Supervisor')->group(function () {
+    Route::middleware('role:Admin,Supervisor')->group(function () {
+        Route::get('/replacement-forecasts/generate/{component}', [ReplacementForecastController::class, 'generate'])
+            ->name('replacement-forecasts.generate');
 
-    Route::get('/replacement-forecasts', [ReplacementForecastController::class, 'index'])
-        ->name('replacement-forecasts.index');
+        Route::post('/replacement-forecasts/refresh/{component}', [ReplacementForecastController::class, 'refresh'])
+            ->name('replacement-forecasts.refresh');
+    });
 
-    Route::get('/replacement-forecasts/{replacementForecast}', [ReplacementForecastController::class, 'show'])
-        ->name('replacement-forecasts.show');
-});
-
-// Generate and refresh forecasts - Admin, Supervisor
-Route::middleware('role:Admin,Supervisor')->group(function () {
-
-    Route::get('/replacement-forecasts/generate/{component}', [ReplacementForecastController::class, 'generate'])
-        ->name('replacement-forecasts.generate');
-
-    Route::post('/replacement-forecasts/refresh/{component}', [ReplacementForecastController::class, 'refresh'])
-        ->name('replacement-forecasts.refresh');
-});
-
-// Delete forecasts - Admin only
-Route::middleware('role:Admin')->group(function () {
-
-    Route::delete('/replacement-forecasts/{replacementForecast}', [ReplacementForecastController::class, 'destroy'])
-        ->name('replacement-forecasts.destroy');
-}); Route::get(
-        '/replacement-forecasts/generate/{component}',
-        [ReplacementForecastController::class, 'generate']
-    )->name('replacement-forecasts.generate');
-
-    Route::post(
-        '/replacement-forecasts/refresh/{component}',
-        [ReplacementForecastController::class, 'refresh']
-    )->name('replacement-forecasts.refresh');
-
-    Route::get(
-        '/replacement-forecasts/{replacementForecast}',
-        [ReplacementForecastController::class, 'show']
-    )->name('replacement-forecasts.show');
-
-    Route::delete(
-        '/replacement-forecasts/{replacementForecast}',
-        [ReplacementForecastController::class, 'destroy']
-    )->name('replacement-forecasts.destroy');
-
+    Route::middleware('role:Admin')->group(function () {
+        Route::delete('/replacement-forecasts/{replacementForecast}', [ReplacementForecastController::class, 'destroy'])
+            ->whereNumber('replacementForecast')
+            ->name('replacement-forecasts.destroy');
+    });
 
     /*
     |--------------------------------------------------------------------------
@@ -665,35 +381,23 @@ Route::middleware('role:Admin')->group(function () {
     |--------------------------------------------------------------------------
     */
 
-    // ==========================================================
-// REPORTS
-// ==========================================================
+    Route::middleware('role:Admin,Technician,Supervisor')->group(function () {
+        Route::get('/reports', [ReportController::class, 'index'])
+            ->name('reports.index');
 
-Route::middleware('role:Admin,Technician,Supervisor')->group(function () {
-
-    Route::get('/reports', [ReportController::class, 'index'])
-        ->name('reports.index');
-
-    Route::get('/reports/print', [ReportController::class, 'print'])
-        ->name('reports.print');
-});
+        Route::get('/reports/print', [ReportController::class, 'print'])
+            ->name('reports.print');
+    });
 
     /*
     |--------------------------------------------------------------------------
     | User Management
     |--------------------------------------------------------------------------
-    | Admin only
-    |--------------------------------------------------------------------------
     */
 
     Route::middleware('role:Admin')->group(function () {
-
-        Route::resource(
-            'users',
-            UserController::class
-        );
+        Route::resource('users', UserController::class);
     });
-
 
     /*
     |--------------------------------------------------------------------------
@@ -701,18 +405,12 @@ Route::middleware('role:Admin,Technician,Supervisor')->group(function () {
     |--------------------------------------------------------------------------
     */
 
-    Route::view(
-        '/profile',
-        'profile'
-    )->name('profile');
+    Route::view('/profile', 'profile')
+        ->name('profile');
 
-    Route::view(
-        '/profile/edit',
-        'profile'
-    )->name('profile.edit');
-
+    Route::view('/profile/edit', 'profile')
+        ->name('profile.edit');
 });
-
 
 /*
 |--------------------------------------------------------------------------

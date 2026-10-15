@@ -255,6 +255,7 @@
                             <th>DC Current</th>
                             <th>Model Status</th>
                             <th>Classification</th>
+                            <th class="text-center">Action</th>
                         </tr>
                     </thead>
 
@@ -265,7 +266,7 @@
                                     {{ $result->observed_at?->format('d M Y, H:i') ?? 'N/A' }}
                                 </td>
 
-                                <td>
+                                <td class="text-nowrap">
                                     {{ $result->source }}-{{ $result->system_id }}
                                 </td>
 
@@ -314,10 +315,22 @@
                                         </span>
                                     @endif
                                 </td>
+
+                                {{-- New observation details link --}}
+                                <td class="text-center">
+                                    <a
+                                        href="{{ route('solar-analysis.show', $result->id) }}"
+                                        class="btn btn-sm btn-outline-primary text-nowrap"
+                                        aria-label="View details for observation {{ $result->id }}"
+                                    >
+                                        <i class="bi bi-eye me-1"></i>
+                                        View Details
+                                    </a>
+                                </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="9" class="text-center py-5">
+                                <td colspan="10" class="text-center py-5">
                                     <p class="text-muted mb-2">
                                         No observations match your filters.
                                     </p>

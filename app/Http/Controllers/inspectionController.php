@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Component;
 use App\Models\Installation;
 use App\Models\Inspection;
+use App\Models\InspectionItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -45,128 +47,64 @@ class InspectionController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'installation_id' => [
-                'required',
-                'exists:installations,id'
-            ],
-
-            'inspection_date' => [
-                'required',
-                'date'
-            ],
-
+            'installation_id' => ['required', 'exists:installations,id'],
+            'inspection_date' => ['required', 'date'],
             'overall_condition' => [
                 'required',
-                'in:Excellent,Good,Fair,Poor,Critical'
+                'in:Excellent,Good,Fair,Poor,Critical',
             ],
-
-            'general_observation' => [
-                'nullable',
-                'string'
-            ],
-
-            'recommendation' => [
-                'nullable',
-                'string'
-            ],
-
-            'remarks' => [
-                'nullable',
-                'string'
-            ],
-
+            'general_observation' => ['nullable', 'string'],
+            'recommendation' => ['nullable', 'string'],
+            'remarks' => ['nullable', 'string'],
             'next_inspection_date' => [
                 'required',
                 'date',
-                'after_or_equal:inspection_date'
+                'after_or_equal:inspection_date',
             ],
-
-            'items' => [
-                'required',
-                'array',
-                'min:1'
-            ],
-
+            'items' => ['required', 'array', 'min:1'],
             'items.*.component_id' => [
                 'required',
-                'exists:components,id'
+                'exists:components,id',
             ],
-
             'items.*.check_item' => [
                 'required',
                 'string',
-                'max:255'
+                'max:255',
             ],
-
             'items.*.result' => [
                 'required',
-                'in:Pass,Fail,Needs Attention,Not Applicable'
+                'in:Pass,Fail,Needs Attention,Not Applicable',
             ],
-
-            'items.*.measurement' => [
-                'nullable',
-                'numeric'
-            ],
-
-            'items.*.unit' => [
-                'nullable',
-                'string',
-                'max:50'
-            ],
-
+            'items.*.measurement' => ['nullable', 'numeric'],
+            'items.*.unit' => ['nullable', 'string', 'max:50'],
             'items.*.condition' => [
                 'required',
-                'in:Excellent,Good,Fair,Poor,Critical'
+                'in:Excellent,Good,Fair,Poor,Critical',
             ],
-
-            'items.*.remarks' => [
-                'nullable',
-                'string'
-            ],
+            'items.*.remarks' => ['nullable', 'string'],
         ]);
 
-        /*
-        |--------------------------------------------------------------------------
-        | Verify components belong to selected installation
-        |--------------------------------------------------------------------------
-        */
-
-        $installation = Installation::with('components')
-            ->findOrFail($validated['installation_id']);
-
-        $installationComponentIds = $installation->components
-            ->pluck('id')
-            ->toArray();
-
-        foreach ($validated['items'] as $item) {
-            if (!in_array($item['component_id'], $installationComponentIds)) {
-                throw ValidationException::withMessages([
-                    'items' => 'One or more selected components do not belong to the selected installation.',
-                ]);
-            }
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Save inspection and checklist items
-        |--------------------------------------------------------------------------
-        */
+        $this->verifyComponentsBelongToInstallation(
+            $validated['installation_id'],
+            $validated['items']
+        );
 
         DB::transaction(function () use ($validated) {
-
             $inspection = Inspection::create([
                 'installation_id' => $validated['installation_id'],
                 'inspector_id' => Auth::id(),
                 'inspection_date' => $validated['inspection_date'],
                 'overall_condition' => $validated['overall_condition'],
-                'general_observation' => $validated['general_observation'] ?? null,
-                'recommendation' => $validated['recommendation'] ?? null,
+                'general_observation' =>
+                    $validated['general_observation'] ?? null,
+                'recommendation' =>
+                    $validated['recommendation'] ?? null,
                 'remarks' => $validated['remarks'] ?? null,
-                'next_inspection_date' => $validated['next_inspection_date'],
+                'next_inspection_date' =>
+                    $validated['next_inspection_date'],
             ]);
 
             foreach ($validated['items'] as $item) {
-
                 $inspection->inspectionItems()->create([
                     'component_id' => $item['component_id'],
                     'check_item' => $item['check_item'],
@@ -177,14 +115,19 @@ class InspectionController extends Controller
                     'remarks' => $item['remarks'] ?? null,
                 ]);
             }
+
+            $this->syncComponentConditions(
+                collect($validated['items'])
+                    ->pluck('component_id')
+                    ->unique()
+                    ->values()
+                    ->all()
+            );
         });
 
         return redirect()
             ->route('inspections.index')
-            ->with(
-                'success',
-                'Inspection completed and recorded successfully.'
-            );
+            ->with('success', 'Inspection completed and recorded successfully.');
     }
 
     /**
@@ -210,9 +153,7 @@ class InspectionController extends Controller
             'inspectionItems.component.componentType',
         ]);
 
-        $installations = Installation::with(
-            'components.componentType'
-        )
+        $installations = Installation::with('components.componentType')
             ->orderBy('name')
             ->get();
 
@@ -223,135 +164,62 @@ class InspectionController extends Controller
     }
 
     /**
-     * Update inspection.
+     * Update an existing inspection.
      */
     public function update(
         Request $request,
         Inspection $inspection
     ) {
         $validated = $request->validate([
-            'installation_id' => [
-                'required',
-                'exists:installations,id'
-            ],
-
-            'inspection_date' => [
-                'required',
-                'date'
-            ],
-
+            'installation_id' => ['required', 'exists:installations,id'],
+            'inspection_date' => ['required', 'date'],
             'overall_condition' => [
                 'required',
-                'in:Excellent,Good,Fair,Poor,Critical'
+                'in:Excellent,Good,Fair,Poor,Critical',
             ],
-
-            'general_observation' => [
-                'nullable',
-                'string'
-            ],
-
-            'recommendation' => [
-                'nullable',
-                'string'
-            ],
-
-            'remarks' => [
-                'nullable',
-                'string'
-            ],
-
+            'general_observation' => ['nullable', 'string'],
+            'recommendation' => ['nullable', 'string'],
+            'remarks' => ['nullable', 'string'],
             'next_inspection_date' => [
                 'required',
                 'date',
-                'after_or_equal:inspection_date'
+                'after_or_equal:inspection_date',
             ],
-
-            'items' => [
-                'required',
-                'array',
-                'min:1'
-            ],
-
-            'items.*.id' => [
-                'nullable',
-                'integer'
-            ],
-
+            'items' => ['required', 'array', 'min:1'],
+            'items.*.id' => ['nullable', 'integer'],
             'items.*.component_id' => [
                 'required',
-                'exists:components,id'
+                'exists:components,id',
             ],
-
             'items.*.check_item' => [
                 'required',
                 'string',
-                'max:255'
+                'max:255',
             ],
-
             'items.*.result' => [
                 'required',
-                'in:Pass,Fail,Needs Attention,Not Applicable'
+                'in:Pass,Fail,Needs Attention,Not Applicable',
             ],
-
-            'items.*.measurement' => [
-                'nullable',
-                'numeric'
-            ],
-
-            'items.*.unit' => [
-                'nullable',
-                'string',
-                'max:50'
-            ],
-
+            'items.*.measurement' => ['nullable', 'numeric'],
+            'items.*.unit' => ['nullable', 'string', 'max:50'],
             'items.*.condition' => [
                 'required',
-                'in:Excellent,Good,Fair,Poor,Critical'
+                'in:Excellent,Good,Fair,Poor,Critical',
             ],
-
-            'items.*.remarks' => [
-                'nullable',
-                'string'
-            ],
+            'items.*.remarks' => ['nullable', 'string'],
         ]);
 
-        /*
-        |--------------------------------------------------------------------------
-        | Verify selected components
-        |--------------------------------------------------------------------------
-        */
+        $this->verifyComponentsBelongToInstallation(
+            $validated['installation_id'],
+            $validated['items']
+        );
 
-        $installation = Installation::with('components')
-            ->findOrFail($validated['installation_id']);
-
-        $installationComponentIds = $installation->components
-            ->pluck('id')
-            ->toArray();
-
-        foreach ($validated['items'] as $item) {
-
-            if (!in_array(
-                $item['component_id'],
-                $installationComponentIds
-            )) {
-
-                throw ValidationException::withMessages([
-                    'items' =>
-                        'One or more selected components do not belong to the selected installation.',
-                ]);
-            }
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Update inspection
-        |--------------------------------------------------------------------------
-        */
-
-        DB::transaction(function () use (
-            $validated,
-            $inspection
-        ) {
+        DB::transaction(function () use ($validated, $inspection) {
+            // Remember old components before replacing the checklist.
+            $oldComponentIds = $inspection->inspectionItems()
+                ->pluck('component_id')
+                ->unique()
+                ->all();
 
             $inspection->update([
                 'installation_id' => $validated['installation_id'],
@@ -361,22 +229,14 @@ class InspectionController extends Controller
                     $validated['general_observation'] ?? null,
                 'recommendation' =>
                     $validated['recommendation'] ?? null,
-                'remarks' =>
-                    $validated['remarks'] ?? null,
+                'remarks' => $validated['remarks'] ?? null,
                 'next_inspection_date' =>
                     $validated['next_inspection_date'],
             ]);
 
-            /*
-            |--------------------------------------------------------------------------
-            | Replace checklist records
-            |--------------------------------------------------------------------------
-            */
-
             $inspection->inspectionItems()->delete();
 
             foreach ($validated['items'] as $item) {
-
                 $inspection->inspectionItems()->create([
                     'component_id' => $item['component_id'],
                     'check_item' => $item['check_item'],
@@ -387,14 +247,22 @@ class InspectionController extends Controller
                     'remarks' => $item['remarks'] ?? null,
                 ]);
             }
+
+            $affectedComponentIds = array_values(array_unique(
+                array_merge(
+                    $oldComponentIds,
+                    collect($validated['items'])
+                        ->pluck('component_id')
+                        ->all()
+                )
+            ));
+
+            $this->syncComponentConditions($affectedComponentIds);
         });
 
         return redirect()
             ->route('inspections.show', $inspection)
-            ->with(
-                'success',
-                'Inspection updated successfully.'
-            );
+            ->with('success', 'Inspection updated successfully.');
     }
 
     /**
@@ -408,29 +276,127 @@ class InspectionController extends Controller
             'inspectionItems.component.componentType',
         ]);
 
-        return view(
-            'inspections.print',
-            compact('inspection')
-        );
+        return view('inspections.print', compact('inspection'));
     }
 
     /**
-     * Delete inspection.
+     * Delete an inspection.
      */
     public function destroy(Inspection $inspection)
     {
         DB::transaction(function () use ($inspection) {
+            $componentIds = $inspection->inspectionItems()
+                ->pluck('component_id')
+                ->unique()
+                ->all();
 
             $inspection->inspectionItems()->delete();
-
             $inspection->delete();
+
+            $this->syncComponentConditions($componentIds);
         });
 
         return redirect()
             ->route('inspections.index')
-            ->with(
-                'success',
-                'Inspection deleted successfully.'
-            );
+            ->with('success', 'Inspection deleted successfully.');
+    }
+
+    /**
+     * Verify every selected component belongs to the selected installation.
+     */
+    private function verifyComponentsBelongToInstallation(
+        int|string $installationId,
+        array $items
+    ): void {
+        $installation = Installation::with('components')
+            ->findOrFail($installationId);
+
+        $installationComponentIds = $installation->components
+            ->pluck('id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
+
+        foreach ($items as $item) {
+            if (!in_array(
+                (int) $item['component_id'],
+                $installationComponentIds,
+                true
+            )) {
+                throw ValidationException::withMessages([
+                    'items' =>
+                        'One or more selected components do not belong to the selected installation.',
+                ]);
+            }
+        }
+    }
+
+    /**
+     * Synchronize component conditions from their latest inspections.
+     *
+     * If multiple checklist items assess the same component during the
+     * latest inspection, the worst recorded condition is used.
+     *
+     * If no inspection history remains, the existing condition is preserved.
+     */
+    private function syncComponentConditions(array $componentIds): void
+    {
+        $conditionRank = [
+            'Excellent' => 1,
+            'Good' => 2,
+            'Fair' => 3,
+            'Poor' => 4,
+            'Critical' => 5,
+        ];
+
+        foreach (array_unique($componentIds) as $componentId) {
+            $component = Component::find($componentId);
+
+            if (!$component) {
+                continue;
+            }
+
+            $latestInspectionId = InspectionItem::query()
+                ->where('inspection_items.component_id', $componentId)
+                ->join(
+                    'inspections',
+                    'inspection_items.inspection_id',
+                    '=',
+                    'inspections.id'
+                )
+                ->orderByDesc('inspections.inspection_date')
+                ->orderByDesc('inspections.id')
+                ->value('inspections.id');
+
+            // Preserve the current condition if no inspection remains.
+            if (!$latestInspectionId) {
+                continue;
+            }
+
+            $conditions = InspectionItem::query()
+                ->where('inspection_id', $latestInspectionId)
+                ->where('component_id', $componentId)
+                ->pluck('condition')
+                ->filter()
+                ->all();
+
+            if (empty($conditions)) {
+                continue;
+            }
+
+            $worstCondition = collect($conditions)
+                ->sortByDesc(
+                    fn ($condition) => $conditionRank[$condition] ?? 0
+                )
+                ->first();
+
+            if (
+                $worstCondition !== null
+                && isset($conditionRank[$worstCondition])
+            ) {
+                $component->update([
+                    'current_condition' => $worstCondition,
+                ]);
+            }
+        }
     }
 }

@@ -14,6 +14,7 @@ use App\Http\Controllers\CostRecordController;
 use App\Http\Controllers\ReplacementForecastController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\SolarAnalysisController;
 
 
 /*
@@ -497,6 +498,19 @@ Route::middleware('role:Admin,Technician')->group(function () {
             [MaintenanceRecordController::class, 'destroy']
         )->name('maintenance-records.destroy');
     });
+
+    /*
+|--------------------------------------------------------------------------
+| Solar Performance Analysis
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware('role:Admin,Technician,Supervisor')->group(function () {
+    Route::get(
+        '/solar-analysis',
+        [SolarAnalysisController::class, 'index']
+    )->name('solar-analysis.index');
+});
 
 
     /*
